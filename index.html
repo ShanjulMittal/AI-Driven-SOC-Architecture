@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next-Gen AI-Driven SOC Architecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Slate 50 */
+            color: #0f172a; /* Slate 900 */
+        }
+        .node-card {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            background-color: #ffffff;
+        }
+        .node-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: #94a3b8; /* slate-400 */
+        }
+        .node-selected {
+            border-color: #0284c7 !important; /* Sky 600 */
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3) !important; /* Sky ring */
+            background-color: #f0f9ff !important; /* Sky 50 */
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; } /* slate-100 */
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; } /* slate-300 */
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; } /* slate-400 */
+
+        .view-hidden { display: none !important; }
+        
+        /* Architecture groupings */
+        .deployment-zone {
+            border: 2px dashed #cbd5e1; /* slate-300 */
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            position: relative;
+            background: rgba(241, 245, 249, 0.5); /* slate-100 with opacity */
+        }
+        .deployment-zone::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -10px;
+            left: 16px;
+            background: #f8fafc; /* Match body bg */
+            padding: 0 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #475569; /* slate-600 */
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 p-4 shrink-0 flex items-center justify-between z-20 shadow-sm">
+        <div>
+            <h1 class="text-2xl font-bold text-sky-700 flex items-center gap-2">
+                <i data-lucide="shield-check"></i>
+                AI-Driven SOC Architecture
+            </h1>
+            <p class="text-sm text-slate-500 mt-1 font-medium">Dual-View: Logical Flow & Technical Deployment</p>
+        </div>
+        <div class="flex gap-2 bg-slate-100 p-1.5 rounded-lg border border-slate-200">
+            <button onclick="openApiKeyModal()" class="px-3 py-2 text-sm rounded-md bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 transition-all shadow-sm flex items-center gap-2" title="Configure API Key">
+                <i data-lucide="key" class="w-4 h-4"></i>
+            </button>
+            <button onclick="openConceptsModal()" class="px-4 py-2 text-sm rounded-md bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold transition-all shadow-sm flex items-center gap-2">
+                <i data-lucide="book-open" class="w-4 h-4 text-emerald-600"></i> Key Concepts
+            </button>
+            <button onclick="openAttackSimulator()" class="px-4 py-2 text-sm rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold transition-all shadow-md flex items-center gap-2 mr-2">
+                ✨ Simulate Attack
+            </button>
+            <div class="w-px bg-slate-300 mx-1"></div>
+            <button id="btn-logical" onclick="switchView('logical')" class="px-4 py-2 text-sm rounded-md bg-sky-100 text-sky-700 font-bold border border-sky-200 transition-all shadow-sm">
+                Logical Architecture
+            </button>
+            <button id="btn-technical" onclick="switchView('technical')" class="px-4 py-2 text-sm rounded-md text-slate-600 hover:text-slate-900 hover:bg-white font-medium transition-all">
+                Technical / Deployment
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+        
+        <!-- Interactive Diagram Area (Left) -->
+        <div class="flex-1 overflow-auto p-8 relative bg-slate-50">
+            
+            <!-- ========================================== -->
+            <!-- VIEW 1: LOGICAL ARCHITECTURE               -->
+            <!-- ========================================== -->
+            <div id="view-logical" class="min-w-[1450px] flex flex-col gap-10 relative h-full">
+                
+                <!-- TOP HALF: The Detection & Reasoning Funnel (Left to Right) -->
+                <div class="flex justify-between items-stretch gap-6 h-3/5">
+                    
+                    <!-- Zone 1: Edge (High Volume / Ultra-Low Latency) -->
+                    <div class="deployment-zone w-[30%] flex flex-col gap-4 bg-white/50" data-label="Tier 1: The Fast Edge (1M+ EPS)">
+                        <div class="text-[10px] text-slate-500 font-mono mb-1 text-center bg-white rounded py-1 border border-slate-200 shadow-sm">Volume: High | Logic: Simple | Latency: &lt;10ms</div>
+                        
+                        <div class="flex flex-wrap justify-center gap-3 w-full">
+                            <div class="border border-slate-200 rounded-lg p-2 text-center node-card flex flex-col items-center justify-center w-[22%] shadow-sm" onclick="selectNode('telemetry')">
+                                <i data-lucide="cloud" class="w-5 h-5 text-slate-500 mb-1"></i>
+                                <h3 class="font-bold text-[9px] text-slate-700">Telemetry</h3>
+                            </div>
+                            <div class="bg-teal-50 border border-teal-200 rounded-lg p-2 text-center node-card flex flex-col items-center justify-center w-[22%] shadow-sm" onclick="selectNode('ndr')">
+                                <i data-lucide="network" class="w-5 h-5 text-teal-600 mb-1"></i>
+                                <h3 class="font-bold text-[9px] text-teal-800">NDR/PCAP</h3>
+                            </div>
+                            <div class="bg-purple-50 border border-purple-200 rounded-lg p-2 text-center node-card flex flex-col items-center justify-center w-[22%] shadow-sm" onclick="selectNode('cti')">
+                                <i data-lucide="globe-2" class="w-5 h-5 text-purple-600 mb-1"></i>
+                                <h3 class="font-bold text-[9px] text-purple-800">CTI Feeds</h3>
+                            </div>
+                            <div class="bg-sky-50 border border-sky-200 rounded-lg p-2 text-center node-card flex flex-col items-center justify-center w-[22%] shadow-sm" onclick="selectNode('cnapp')">
+                                <i data-lucide="cloud-cog" class="w-5 h-5 text-sky-600 mb-1"></i>
+                                <h3 class="font-bold text-[9px] text-sky-800">CNAPP</h3>
+                            </div>
+                            <div class="bg-pink-50 border border-pink-200 rounded-lg p-2 text-center node-card flex flex-col items-center justify-center w-[28%] shadow-sm" onclick="selectNode('asm')">
+                                <i data-lucide="scan" class="w-5 h-5 text-pink-600 mb-1"></i>
+                                <h3 class="font-bold text-[9px] text-pink-800">ASM/Vulns</h3>
+                            </div>
+                            <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-2 text-center node-card flex flex-col items-center justify-center w-[28%] shadow-sm" onclick="selectNode('deception')">
+                                <i data-lucide="ghost" class="w-5 h-5 text-yellow-600 mb-1"></i>
+                                <h3 class="font-bold text-[9px] text-yellow-800">Deception</h3>
+                            </div>
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-2 text-center node-card flex flex-col items-center justify-center w-[35%] shadow-sm" onclick="selectNode('bas')">
+                                <i data-lucide="swords" class="w-5 h-5 text-red-600 mb-1"></i>
+                                <h3 class="font-bold text-[9px] text-red-800">Red AI (BAS)</h3>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-center text-slate-400 mt-[-8px]"><i data-lucide="arrow-down" class="w-5 h-5"></i></div>
+                        
+                        <div class="flex gap-3">
+                            <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-2 text-center node-card relative w-1/3 flex flex-col justify-center items-center shadow-sm" onclick="selectNode('sovereignty')">
+                                <i data-lucide="map-pin" class="w-6 h-6 text-indigo-600 mb-1"></i>
+                                <h3 class="font-bold text-[10px] text-indigo-900">Sovereignty</h3>
+                                <p class="text-[8px] text-indigo-700 mt-1">GDPR Router</p>
+                            </div>
+                            <div class="bg-emerald-50 border-2 border-emerald-300 rounded-lg p-3 text-center node-card relative w-2/3 shadow-md" onclick="selectNode('slm')">
+                                <span class="absolute -top-2 -right-2 bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm">SLM</span>
+                                <i data-lucide="cpu" class="w-8 h-8 text-emerald-600 mx-auto mb-1"></i>
+                                <h3 class="font-black text-sm text-emerald-900">Micro-Triage & Masking</h3>
+                                <p class="text-[10px] text-emerald-800 mt-1 font-medium">Parses, redacts PII, flags LotL.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-center flex-col text-slate-300 w-4">
+                        <i data-lucide="filter" class="w-5 h-5 mb-1 text-slate-400"></i>
+                        <i data-lucide="arrow-right" class="w-8 h-8"></i>
+                    </div>
+
+                    <!-- Zone 2: Fast Brain (Medium Volume / Deterministic & UEBA) -->
+                    <div class="deployment-zone w-[20%] flex flex-col justify-center gap-3 bg-white/50" data-label="Tier 2: The Engine (~500 Alerts/Day)">
+                        <div class="text-[10px] text-slate-500 font-mono mb-1 text-center bg-white rounded py-1 border border-slate-200 shadow-sm">Volume: Medium | Latency: ~1s</div>
+                        
+                        <div class="flex flex-col gap-3 h-full">
+                            <div class="bg-orange-50 border border-orange-300 rounded-lg p-3 text-center node-card relative h-1/3 flex flex-col justify-center shadow-sm" onclick="selectNode('correlation')">
+                                <i data-lucide="activity" class="w-6 h-6 text-orange-600 mx-auto mb-1"></i>
+                                <h3 class="font-bold text-[11px] text-orange-900">Stream Correlation</h3>
+                            </div>
+                            <div class="bg-indigo-50 border border-indigo-300 rounded-lg p-3 text-center node-card relative h-1/3 flex flex-col justify-center shadow-sm" onclick="selectNode('ueba')">
+                                <i data-lucide="user-cog" class="w-6 h-6 text-indigo-600 mx-auto mb-1"></i>
+                                <h3 class="font-bold text-[11px] text-indigo-900">UEBA Baselines</h3>
+                            </div>
+                            <div class="bg-blue-50 border border-blue-300 rounded-lg p-3 text-center node-card relative h-1/3 flex flex-col justify-center shadow-sm" onclick="selectNode('hot-storage')">
+                                <i data-lucide="database-zap" class="w-6 h-6 text-blue-600 mx-auto mb-1"></i>
+                                <h3 class="font-bold text-[11px] text-blue-900">Hot Data Index</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-center flex-col text-slate-300 w-4">
+                        <i data-lucide="filter" class="w-5 h-5 mb-1 text-slate-400"></i>
+                        <i data-lucide="arrow-right" class="w-8 h-8"></i>
+                    </div>
+
+                    <!-- Zone 3: Deep Brain (Low Volume / High Cognitive / FinOps) -->
+                    <div class="deployment-zone w-[44%] flex flex-col gap-3 bg-indigo-50/30 border-indigo-200" data-label="Tier 3: The Deep Brain (~10 Incidents/Day)">
+                        <div class="text-[10px] text-indigo-600 font-mono mb-1 text-center bg-white rounded py-1 border border-indigo-100 shadow-sm">Volume: Low | Logic: Advanced | Latency: 5-15s</div>
+                        
+                        <div class="flex gap-3 h-full items-stretch">
+                            <!-- Left: RAG & Provenance -->
+                            <div class="flex flex-col gap-3 w-1/4">
+                                <div class="bg-fuchsia-50 border border-fuchsia-300 rounded-lg p-2 text-center node-card h-[65%] flex flex-col justify-center shadow-sm" onclick="selectNode('rag')">
+                                    <i data-lucide="database" class="w-6 h-6 text-fuchsia-600 mx-auto mb-2"></i>
+                                    <h3 class="font-bold text-[11px] text-fuchsia-900">RAG Memory</h3>
+                                </div>
+                                <div class="bg-emerald-50 border border-emerald-300 rounded-lg p-2 text-center node-card h-[35%] flex flex-col justify-center shadow-sm" onclick="selectNode('provenance')">
+                                    <i data-lucide="file-badge-2" class="w-5 h-5 text-emerald-600 mx-auto mb-1"></i>
+                                    <h3 class="font-bold text-[9px] text-emerald-900">Provenance</h3>
+                                </div>
+                            </div>
+                            
+                            <!-- Middle: Guardrail & Router -->
+                            <div class="flex flex-col gap-3 w-1/4">
+                                <div class="bg-rose-50 border border-rose-300 rounded-lg p-2 text-center node-card h-1/2 flex flex-col justify-center items-center shadow-sm" onclick="selectNode('guardrail')">
+                                    <i data-lucide="shield-ban" class="w-6 h-6 text-rose-600 mb-1"></i>
+                                    <h3 class="font-bold text-[10px] text-rose-900">Guardrails</h3>
+                                </div>
+                                <div class="bg-amber-50 border border-amber-300 rounded-lg p-2 text-center node-card h-1/2 flex flex-col justify-center items-center shadow-sm" onclick="selectNode('router')">
+                                    <i data-lucide="split" class="w-6 h-6 text-amber-600 mb-1"></i>
+                                    <h3 class="font-bold text-[10px] text-amber-900">Model Router</h3>
+                                    <p class="text-[8px] text-amber-700 mt-1">Cost FinOps</p>
+                                </div>
+                            </div>
+
+                            <!-- Right: LLM -->
+                            <div class="bg-indigo-50 border-2 border-indigo-400 rounded-lg p-4 text-center w-2/4 node-card relative shadow-md flex flex-col justify-center" onclick="selectNode('llm')">
+                                <span class="absolute -top-2 -right-2 bg-indigo-600 text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm">LLM</span>
+                                <i data-lucide="brain-circuit" class="w-10 h-10 text-indigo-700 mx-auto mb-3"></i>
+                                <h3 class="font-black text-lg text-indigo-950">Agentic Core</h3>
+                                <p class="text-[11px] text-indigo-800 mt-2 font-medium">Investigates alerts, queries Hot Index, deduces intent.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOTTOM HALF: The MCP Action Loop & Governance (Right to Left) -->
+                <div class="h-2/5 mt-4 relative flex gap-6">
+                    
+                    <!-- Left: MCP Action Loop with API Gateway & iPaaS -->
+                    <div class="deployment-zone w-[78%] h-full bg-cyan-50/30 border-cyan-200 flex items-center justify-between p-5 relative" data-label="Tier 4: Enterprise Action Bus (MCP) & GRC">
+                        
+                        <!-- Visual connecting line from LLM down to Governance -->
+                        <div class="absolute right-[12%] top-[-2.5rem] w-[2px] h-[2.5rem] bg-indigo-200 border-l-2 border-dashed border-indigo-400"></div>
+                        <div class="absolute right-[12%] top-0 text-indigo-500"><i data-lucide="arrow-down" class="w-5 h-5 -translate-x-1/2 -translate-y-1"></i></div>
+
+                        <div class="flex w-full items-center justify-between gap-4 h-full">
+                            <!-- Target Systems -->
+                            <div class="grid grid-cols-2 gap-3 w-[20%] h-full content-center">
+                                <div class="bg-white border border-slate-200 rounded-lg p-2 node-card flex items-center justify-center gap-2 shadow-sm" onclick="selectNode('mcp-fw')">
+                                    <i data-lucide="shield-alert" class="w-4 h-4 text-sky-600"></i> <span class="text-[9px] font-bold text-slate-700">FW API</span>
+                                </div>
+                                <div class="bg-white border border-slate-200 rounded-lg p-2 node-card flex items-center justify-center gap-2 shadow-sm" onclick="selectNode('mcp-idp')">
+                                    <i data-lucide="users" class="w-4 h-4 text-sky-600"></i> <span class="text-[9px] font-bold text-slate-700">IdP API</span>
+                                </div>
+                                <div class="bg-white border border-slate-200 rounded-lg p-2 node-card flex items-center justify-center gap-2 shadow-sm" onclick="selectNode('mcp-edr')">
+                                    <i data-lucide="laptop" class="w-4 h-4 text-sky-600"></i> <span class="text-[9px] font-bold text-slate-700">EDR API</span>
+                                </div>
+                                <div class="bg-white border border-slate-200 rounded-lg p-2 node-card flex items-center justify-center gap-2 shadow-sm" onclick="selectNode('mcp-itsm')">
+                                    <i data-lucide="ticket" class="w-4 h-4 text-sky-600"></i> <span class="text-[9px] font-bold text-slate-700">ITSM</span>
+                                </div>
+                            </div>
+
+                            <!-- iPaaS / Enterprise Service Bus -->
+                            <div class="w-[10%] flex justify-center relative">
+                                <div class="bg-purple-50 border border-purple-300 rounded-lg p-2 node-card text-center shadow-sm z-10 h-full flex flex-col justify-center w-full" onclick="selectNode('ipaas')">
+                                    <i data-lucide="workflow" class="w-5 h-5 text-purple-600 mx-auto mb-1"></i>
+                                    <h3 class="font-bold text-purple-900 text-[10px]">iPaaS Bus</h3>
+                                    <p class="text-[8px] text-purple-700 mt-1">Connectors</p>
+                                </div>
+                                <div class="absolute w-full h-[2px] top-1/2 -translate-y-1/2 -z-10 bg-cyan-200"></div>
+                            </div>
+
+                            <!-- API Gateway -->
+                            <div class="w-[10%] flex justify-center relative">
+                                <div class="bg-teal-50 border border-teal-300 rounded-lg p-2 node-card text-center shadow-sm z-10 h-full flex flex-col justify-center w-full" onclick="selectNode('api-gw')">
+                                    <i data-lucide="route" class="w-5 h-5 text-teal-600 mx-auto mb-1"></i>
+                                    <h3 class="font-bold text-teal-900 text-[10px]">API Gateway</h3>
+                                </div>
+                                <div class="absolute w-full h-[2px] top-1/2 -translate-y-1/2 -z-10 bg-cyan-200"></div>
+                            </div>
+
+                            <!-- MCP Client + Secrets Vault -->
+                            <div class="w-[20%] flex flex-col gap-3 h-full justify-center">
+                                <div class="bg-teal-50 border border-teal-200 rounded-lg p-2 node-card text-center flex items-center justify-center gap-2 shadow-sm" onclick="selectNode('vault')">
+                                    <i data-lucide="key-round" class="w-4 h-4 text-teal-600"></i>
+                                    <h3 class="font-bold text-teal-900 text-[10px]">Secrets Vault</h3>
+                                </div>
+                                <div class="bg-cyan-50 border-2 border-cyan-400 rounded-lg p-3 node-card text-center shadow-md z-10 flex-1 flex flex-col justify-center" onclick="selectNode('mcp')">
+                                    <i data-lucide="plug" class="w-6 h-6 text-cyan-600 mx-auto mb-1"></i>
+                                    <h3 class="font-black text-cyan-900 text-[12px]">MCP Client Bus</h3>
+                                </div>
+                            </div>
+
+                            <!-- Visual feedback arrow right to left -->
+                            <div class="w-4 relative flex items-center justify-center">
+                                <div class="w-full h-[3px] bg-gradient-to-l from-amber-300 to-cyan-400 relative rounded-full">
+                                    <div class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 flex text-cyan-600">
+                                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- HITL Governance & GRC Stack -->
+                            <div class="w-[32%] flex flex-col gap-3 h-full justify-center">
+                                <div class="flex gap-3 h-1/2">
+                                    <div class="bg-amber-50 border border-amber-300 rounded-lg p-2 node-card text-center shadow-sm z-10 w-1/2 flex flex-col justify-center relative" onclick="selectNode('hitl')">
+                                        <i data-lucide="users-round" class="w-5 h-5 text-amber-600 mx-auto mb-1"></i>
+                                        <h3 class="font-bold text-amber-900 text-[10px]">Analyst Copilot</h3>
+                                    </div>
+                                    <div class="bg-pink-50 border border-pink-300 rounded-lg p-2 node-card text-center shadow-sm z-10 w-1/2 flex flex-col justify-center relative" onclick="selectNode('pac')">
+                                        <i data-lucide="scroll" class="w-5 h-5 text-pink-600 mx-auto mb-1"></i>
+                                        <h3 class="font-bold text-pink-900 text-[10px]">Policy-as-Code</h3>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3 h-1/2">
+                                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-2 node-card text-center flex flex-col justify-center w-1/2 shadow-sm" onclick="selectNode('exec-dash')">
+                                        <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-600 mx-auto mb-1"></i>
+                                        <h3 class="font-bold text-indigo-900 text-[10px]">CISO Dash</h3>
+                                    </div>
+                                    <div class="bg-slate-100 border border-slate-300 rounded-lg p-2 node-card text-center flex flex-col justify-center w-1/2 shadow-sm" onclick="selectNode('ledger')">
+                                        <i data-lucide="scroll-text" class="w-5 h-5 text-slate-600 mx-auto mb-1"></i>
+                                        <h3 class="font-bold text-slate-800 text-[10px]">Immutable Ledger</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Platform Engineering (MLOps, GitOps, Observability) -->
+                    <div class="deployment-zone w-[22%] h-full bg-slate-100/50 border-slate-200 p-4 relative flex flex-col gap-3" data-label="Tier 5: Platform Eng">
+                        <div class="flex gap-3 h-1/2">
+                            <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 node-card text-center shadow-sm w-1/2 flex flex-col justify-center" onclick="selectNode('mlops')">
+                                <i data-lucide="refresh-cw" class="w-5 h-5 text-emerald-600 mx-auto mb-1"></i>
+                                <h3 class="font-bold text-emerald-900 text-[10px]">MLOps</h3>
+                            </div>
+                            <div class="bg-white border border-slate-300 rounded-lg p-2 node-card text-center shadow-sm w-1/2 flex flex-col justify-center" onclick="selectNode('gitops')">
+                                <i data-lucide="git-merge" class="w-5 h-5 text-slate-600 mx-auto mb-1"></i>
+                                <h3 class="font-bold text-slate-800 text-[10px]">GitOps</h3>
+                            </div>
+                        </div>
+                        <div class="bg-cyan-50 border border-cyan-300 rounded-lg p-2 node-card text-center shadow-sm h-1/2 flex flex-col items-center justify-center gap-1" onclick="selectNode('observability')">
+                            <i data-lucide="gauge" class="w-6 h-6 text-cyan-600"></i>
+                            <h3 class="font-bold text-cyan-900 text-[11px]">Observability</h3>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ========================================== -->
+            <!-- VIEW 2: TECHNICAL / DEPLOYMENT ARCH        -->
+            <!-- ========================================== -->
+            <div id="view-technical" class="min-w-[1450px] flex flex-col gap-8 relative h-full view-hidden pb-10">
+                
+                <!-- Infrastructure Layer 1 -->
+                <div class="flex gap-6">
+                    <div class="deployment-zone w-[40%] flex flex-col gap-3 border-slate-300 bg-white/50" data-label="Enterprise Data, Context & Validation">
+                        <div class="flex gap-2">
+                            <div class="bg-white border border-slate-200 rounded-lg p-2 text-[10px] flex items-center gap-1 shadow-sm w-[33%] text-slate-700 font-medium"><i data-lucide="server" class="w-4 h-4 text-slate-400"></i> CloudTrail/EDR</div>
+                            <div class="bg-teal-50 border border-teal-200 rounded-lg p-2 text-[10px] flex items-center gap-1 node-card shadow-sm w-[33%] text-teal-800 font-medium" onclick="selectNode('tech-ndr')"><i data-lucide="network" class="w-4 h-4 text-teal-600"></i> Zeek/Corelight</div>
+                            <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-2 text-[10px] flex items-center gap-1 node-card shadow-sm w-[34%] text-yellow-800 font-medium" onclick="selectNode('tech-deception')"><i data-lucide="ghost" class="w-4 h-4 text-yellow-600"></i> Thinkst Canaries</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="bg-purple-50 border border-purple-200 rounded-lg p-2 text-[10px] flex items-center justify-center gap-1 node-card shadow-sm w-[33%] text-purple-800 font-medium" onclick="selectNode('tech-cti')"><i data-lucide="globe" class="w-4 h-4 text-purple-600"></i> MISP (CTI)</div>
+                            <div class="bg-pink-50 border border-pink-200 rounded-lg p-2 text-[10px] flex items-center justify-center gap-1 node-card shadow-sm w-[33%] text-pink-800 font-medium" onclick="selectNode('tech-asm')"><i data-lucide="scan" class="w-4 h-4 text-pink-600"></i> Tenable (ASM)</div>
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-2 text-[10px] flex items-center justify-center gap-1 node-card shadow-sm w-[34%] text-red-800 font-medium" onclick="selectNode('tech-bas')"><i data-lucide="swords" class="w-4 h-4 text-red-600"></i> AttackIQ (BAS)</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-center text-slate-300 w-[3%]"><i data-lucide="arrow-right" class="w-6 h-6"></i></div>
+
+                    <div class="deployment-zone w-[57%] flex flex-col gap-3 border-emerald-200 bg-emerald-50/30" data-label="DMZ Ingress / Kubernetes Edge Cluster">
+                        <div class="flex gap-3 h-full">
+                            <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-3 w-[25%] node-card shadow-sm flex flex-col justify-center text-center" onclick="selectNode('tech-sovereignty')">
+                                <h4 class="text-[11px] font-bold text-indigo-900 mb-1 flex items-center justify-center gap-1"><i data-lucide="map-pin" class="w-4 h-4 text-indigo-600"></i> Envoy Router</h4>
+                                <p class="text-[9px] text-indigo-700 font-medium">Geo-fencing logic.</p>
+                            </div>
+                            <div class="bg-white border border-slate-200 rounded-lg p-3 w-[40%] node-card shadow-sm text-center flex flex-col justify-center" onclick="selectNode('tech-kafka')">
+                                <h4 class="text-xs font-bold text-slate-800 mb-1 border-b border-slate-100 pb-1 flex items-center justify-center gap-1"><i data-lucide="layers" class="w-4 h-4 text-slate-500"></i> Apache Kafka Fabric</h4>
+                                <p class="text-[10px] text-slate-500 font-medium">Topics: raw_logs, pcap_streams</p>
+                            </div>
+                            <div class="bg-emerald-50 border-2 border-emerald-300 rounded-lg p-3 w-[35%] node-card shadow-md text-center flex flex-col justify-center" onclick="selectNode('tech-slm')">
+                                <h4 class="text-[12px] font-bold text-emerald-900 mb-1 border-b border-emerald-200 pb-1 flex items-center justify-center gap-1"><i data-lucide="cpu" class="w-4 h-4 text-emerald-600"></i> Triton Inference</h4>
+                                <p class="text-[10px] text-emerald-800 font-medium">Llama-3-8B (TensorRT).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Down Arrow -->
+                <div class="flex justify-between w-[97%] ml-auto">
+                    <div class="flex justify-center text-slate-300 w-[20%]"><i data-lucide="arrow-down" class="w-6 h-6"></i></div>
+                    <div class="flex justify-center text-slate-300 w-[57%]"><i data-lucide="arrow-down" class="w-6 h-6"></i></div>
+                </div>
+
+                <!-- Infrastructure Layer 2 -->
+                <div class="flex gap-6 justify-end">
+                    <div class="deployment-zone w-[20%] border-slate-300 bg-slate-100/50 flex flex-col gap-3 justify-center" data-label="Platform Engineering VPC">
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3 node-card shadow-sm h-1/3 flex flex-col justify-center text-center" onclick="selectNode('tech-mlops')">
+                            <h4 class="text-[11px] font-bold text-emerald-900 mb-0.5 flex items-center justify-center gap-1"><i data-lucide="box" class="w-4 h-4 text-emerald-600"></i> Kubeflow</h4>
+                            <p class="text-[9px] text-emerald-700 font-medium">RLHF model tuning.</p>
+                        </div>
+                        <div class="bg-white border border-slate-200 rounded-lg p-3 node-card shadow-sm h-1/3 flex flex-col justify-center text-center" onclick="selectNode('tech-gitops')">
+                            <h4 class="text-[11px] font-bold text-slate-800 mb-0.5 flex items-center justify-center gap-1"><i data-lucide="git-merge" class="w-4 h-4 text-slate-500"></i> ArgoCD/Terraform</h4>
+                            <p class="text-[9px] text-slate-500 font-medium">Declarative K8s configs.</p>
+                        </div>
+                        <div class="bg-cyan-50 border border-cyan-200 rounded-lg p-3 node-card shadow-sm h-1/3 flex flex-col justify-center text-center" onclick="selectNode('tech-observability')">
+                            <h4 class="text-[11px] font-bold text-cyan-900 mb-0.5 flex items-center justify-center gap-1"><i data-lucide="gauge" class="w-4 h-4 text-cyan-600"></i> Prom/Grafana</h4>
+                            <p class="text-[9px] text-cyan-700 font-medium">Metrics & Tracing (OTel).</p>
+                        </div>
+                    </div>
+
+                    <div class="deployment-zone w-[77%] flex flex-col gap-3 border-orange-200 bg-orange-50/30" data-label="Data Processing & Indexing VPC">
+                        <div class="flex gap-4 h-full">
+                            <div class="bg-orange-50 border border-orange-300 rounded-lg p-4 w-[25%] node-card shadow-sm text-center flex flex-col justify-center" onclick="selectNode('tech-flink')">
+                                <h4 class="text-xs font-bold text-orange-900 mb-1 border-b border-orange-200 pb-1 flex items-center justify-center gap-1"><i data-lucide="activity" class="w-4 h-4 text-orange-600"></i> Apache Flink</h4>
+                                <p class="text-[10px] text-orange-800 font-medium">Stateful CEP, Sigma rules.</p>
+                            </div>
+                            <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4 w-[25%] node-card shadow-sm text-center flex flex-col justify-center" onclick="selectNode('tech-ueba')">
+                                <h4 class="text-[12px] font-bold text-indigo-900 mb-1 border-b border-indigo-200 pb-1 flex items-center justify-center gap-1"><i data-lucide="user-cog" class="w-4 h-4 text-indigo-600"></i> Spark MLlib/UEBA</h4>
+                                <p class="text-[10px] text-indigo-700 font-medium">Securonix Baselines.</p>
+                            </div>
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 w-[25%] node-card shadow-sm text-center flex flex-col justify-center" onclick="selectNode('tech-hot-storage')">
+                                <h4 class="text-[12px] font-bold text-blue-900 mb-1 border-b border-blue-200 pb-1 flex items-center justify-center gap-1"><i data-lucide="database-zap" class="w-4 h-4 text-blue-600"></i> OpenSearch</h4>
+                                <p class="text-[10px] text-blue-700 font-medium">Hot tier (30 days).</p>
+                            </div>
+                            <div class="bg-slate-100 border border-slate-300 rounded-lg p-4 w-[25%] node-card shadow-sm text-center flex flex-col justify-center" onclick="selectNode('tech-siem')">
+                                <h4 class="text-[12px] font-bold text-slate-800 mb-1 border-b border-slate-200 pb-1 flex items-center justify-center gap-1"><i data-lucide="archive" class="w-4 h-4 text-slate-500"></i> Iceberg Lake</h4>
+                                <p class="text-[10px] text-slate-500 font-medium">Cold storage (S3).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Down Arrow -->
+                <div class="flex justify-center text-slate-300 w-[77%] ml-auto"><i data-lucide="arrow-down" class="w-6 h-6"></i></div>
+
+                <!-- Infrastructure Layer 3 (Deep AI & Governance) -->
+                <div class="flex gap-4 justify-end">
+                    <div class="deployment-zone w-[98%] flex flex-col gap-3 border-indigo-200 bg-indigo-50/50" data-label="Secure AI Core VPC (Zero Internet Egress)">
+                        <div class="flex gap-4 h-full">
+                            <!-- Memory & Guardrails -->
+                            <div class="flex flex-col gap-3 w-[16%]">
+                                <div class="flex gap-2 h-1/2">
+                                    <div class="bg-fuchsia-50 border border-fuchsia-200 rounded-lg p-2 node-card shadow-sm w-[60%] flex flex-col justify-center text-center" onclick="selectNode('tech-milvus')">
+                                        <h4 class="text-[11px] font-bold text-fuchsia-900 mb-0.5">Milvus DB</h4>
+                                        <p class="text-[8px] text-fuchsia-700 font-medium">Vector Memory.</p>
+                                    </div>
+                                    <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2 node-card shadow-sm w-[40%] flex flex-col justify-center text-center" onclick="selectNode('tech-provenance')">
+                                        <h4 class="text-[10px] font-bold text-emerald-900 mb-0.5">Sigstore</h4>
+                                    </div>
+                                </div>
+                                <div class="bg-rose-50 border border-rose-200 rounded-lg p-3 node-card shadow-sm h-[30%] flex flex-col justify-center text-center" onclick="selectNode('tech-guardrail')">
+                                    <h4 class="text-[11px] font-bold text-rose-900 mb-1">NeMo Guardrails</h4>
+                                </div>
+                                <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 node-card shadow-sm h-[30%] flex flex-col justify-center text-center" onclick="selectNode('tech-router')">
+                                    <h4 class="text-[11px] font-bold text-amber-900 mb-1">LiteLLM Router</h4>
+                                    <p class="text-[8px] text-amber-700 font-medium">Cost Optimization.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Core LLM & Compliance -->
+                            <div class="flex flex-col gap-3 w-[28%]">
+                                <div class="bg-indigo-50 border-2 border-indigo-400 rounded-lg p-5 node-card shadow-md flex flex-col justify-center text-center h-[70%]" onclick="selectNode('tech-llm')">
+                                    <h4 class="text-[15px] font-black text-indigo-950 mb-2 border-b border-indigo-200 pb-2 flex justify-center items-center gap-2">
+                                        <i data-lucide="server-cog" class="w-5 h-5 text-indigo-600"></i> vLLM / TGI Server
+                                    </h4>
+                                    <p class="text-[12px] text-indigo-800 font-bold">Model: Llama-3-70B.</p>
+                                    <p class="text-[11px] text-indigo-700 mt-1 font-medium">Hardware: 4x H100 Nodes.</p>
+                                </div>
+                                <div class="bg-slate-100 border border-slate-300 rounded-lg p-3 node-card shadow-sm flex items-center justify-center gap-3 h-[30%]" onclick="selectNode('tech-ledger')">
+                                    <i data-lucide="scroll-text" class="w-5 h-5 text-slate-500"></i>
+                                    <div class="text-left">
+                                        <h4 class="text-[11px] font-bold text-slate-800">AWS S3 Object Lock</h4>
+                                        <p class="text-[9px] text-slate-500 font-medium">WORM Storage.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Middleware, GRC, Vault, Gateway & UI -->
+                            <div class="flex flex-col gap-3 w-[56%]">
+                                <div class="flex gap-3 h-[45%]">
+                                    <div class="flex flex-col w-[25%] gap-2">
+                                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 node-card shadow-sm h-1/2 flex flex-col justify-center text-center" onclick="selectNode('tech-hitl')">
+                                            <h4 class="text-[10px] font-bold text-amber-900 mb-0.5">Analyst Workbench</h4>
+                                        </div>
+                                        <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-2 node-card shadow-sm h-1/2 flex flex-col justify-center text-center" onclick="selectNode('tech-exec-dash')">
+                                            <h4 class="text-[10px] font-bold text-indigo-900 mb-0.5">PowerBI Dashboards</h4>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col w-[20%] gap-2">
+                                        <div class="bg-pink-50 border border-pink-200 rounded-lg p-2 node-card shadow-sm h-1/2 flex flex-col justify-center text-center" onclick="selectNode('tech-pac')">
+                                            <h4 class="text-[10px] font-bold text-pink-900 mb-0.5">OPA (Open Policy)</h4>
+                                        </div>
+                                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 node-card shadow-sm h-1/2 flex flex-col justify-center text-center" onclick="selectNode('tech-chatops')">
+                                            <h4 class="text-[10px] font-bold text-amber-900 mb-0.5">Slack Webhooks</h4>
+                                        </div>
+                                    </div>
+                                    <div class="bg-teal-50 border border-teal-200 rounded-lg p-2 node-card shadow-sm w-[15%] flex flex-col justify-center text-center" onclick="selectNode('tech-vault')">
+                                        <h4 class="text-[10px] font-bold text-teal-900 mb-1">HashiCorp Vault</h4>
+                                        <p class="text-[8px] text-teal-700 font-medium">JIT tokens.</p>
+                                    </div>
+                                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-2 node-card shadow-sm w-[20%] flex flex-col justify-center text-center" onclick="selectNode('tech-ipaas')">
+                                        <h4 class="text-[10px] font-bold text-purple-900 mb-1 flex items-center justify-center gap-1"><i data-lucide="workflow" class="w-3 h-3 text-purple-600"></i> MuleSoft iPaaS</h4>
+                                        <p class="text-[8px] text-purple-700 font-medium">Integration Bus.</p>
+                                    </div>
+                                    <div class="bg-teal-50 border-2 border-teal-300 rounded-lg p-2 node-card shadow-sm w-[20%] flex flex-col justify-center text-center" onclick="selectNode('tech-api-gw')">
+                                        <h4 class="text-[10px] font-bold text-teal-900 mb-1 flex items-center justify-center gap-1"><i data-lucide="route" class="w-3 h-3 text-teal-600"></i> Kong Gateway</h4>
+                                        <p class="text-[8px] text-teal-700 font-medium">mTLS / Routing.</p>
+                                    </div>
+                                </div>
+                                <div class="bg-cyan-50 border-2 border-cyan-300 rounded-lg p-3 node-card shadow-md h-[55%] flex items-center" onclick="selectNode('tech-mcp')">
+                                    <div class="w-full text-center">
+                                        <h4 class="text-[13px] font-black text-cyan-900 mb-2 flex items-center justify-center gap-2"><i data-lucide="network" class="w-4 h-4 text-cyan-600"></i> MCP Middleware (FastAPI / Node.js)</h4>
+                                        <p class="text-[10px] text-cyan-800 font-medium">Translates AI JSON to REST. Fetches JIT tokens from Vault, routes through Kong to MuleSoft iPaaS, bounded by OPA Policies.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Detail Panel (Right) -->
+        <div class="w-full lg:w-[450px] bg-white border-l border-slate-200 flex flex-col shrink-0 shadow-2xl z-30">
+            <div class="p-5 border-b border-slate-200 bg-white/90 backdrop-blur sticky top-0 z-20 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2" id="panel-title">
+                    <i data-lucide="info" class="w-6 h-6 text-sky-600"></i>
+                    Component Specs
+                </h2>
+                <div id="ai-actions" class="hidden flex gap-2">
+                    <button onclick="explainComponent('ELI5')" class="px-3 py-1.5 text-[11px] uppercase font-bold tracking-wider rounded bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors border border-indigo-200 shadow-sm flex items-center gap-1"><i data-lucide="sparkles" class="w-3 h-3"></i> Simplify</button>
+                    <button onclick="explainComponent('Expert')" class="px-3 py-1.5 text-[11px] uppercase font-bold tracking-wider rounded bg-fuchsia-50 text-fuchsia-700 hover:bg-fuchsia-100 transition-colors border border-fuchsia-200 shadow-sm flex items-center gap-1"><i data-lucide="microscope" class="w-3 h-3"></i> Deep Dive</button>
+                </div>
+            </div>
+            
+            <div id="detail-content" class="p-6 overflow-y-auto flex-1 relative bg-slate-50/50">
+                <div class="flex flex-col items-center justify-center h-full text-slate-400 text-center gap-4">
+                    <i data-lucide="mouse-pointer-click" class="w-16 h-16 opacity-30 text-slate-400"></i>
+                    <p class="text-sm font-medium text-slate-500 max-w-[250px]">Select a component in either the Logical or Technical view to explore its specifications, detection capabilities, and mitigation roles.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Key Concepts Modal -->
+    <div id="concepts-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white border border-slate-200 rounded-xl max-w-6xl w-full shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-xl shrink-0">
+                <h2 class="text-2xl font-bold text-emerald-700 flex items-center gap-2">
+                    <i data-lucide="book-open" class="w-6 h-6 text-emerald-600"></i> Architectural Concepts & Philosophy
+                </h2>
+                <button onclick="closeConceptsModal()" class="text-slate-400 hover:text-slate-600 bg-white p-1 rounded-md border border-slate-200 shadow-sm transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-8 overflow-y-auto flex-1 custom-scrollbar space-y-10 bg-white">
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- SLM vs LLM -->
+                    <section class="col-span-1 lg:col-span-3">
+                        <h3 class="text-xl font-bold text-slate-800 mb-5 border-b border-slate-200 pb-2 flex items-center gap-2"><i data-lucide="brain-circuit" class="w-6 h-6 text-indigo-600"></i> 1. The AI Core & FinOps</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="bg-emerald-50 p-5 rounded-xl border border-emerald-200 shadow-sm">
+                                <h4 class="text-emerald-800 font-bold mb-2 text-base flex items-center gap-2"><i data-lucide="cpu" class="w-5 h-5 text-emerald-600"></i> SLMs (The "Fast Edge")</h4>
+                                <ul class="text-sm text-emerald-900 space-y-2 list-disc pl-4 font-medium">
+                                    <li><strong>Purpose:</strong> High-speed bouncers handling high-volume tasks in milliseconds.</li>
+                                    <li><strong>Action:</strong> Parses logs, flags single obfuscated CLI commands instantly, and masks PII/PHI <em>before</em> downstream storage.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-indigo-50 p-5 rounded-xl border border-indigo-200 shadow-sm">
+                                <h4 class="text-indigo-800 font-bold mb-2 text-base flex items-center gap-2"><i data-lucide="brain" class="w-5 h-5 text-indigo-600"></i> Agentic LLMs (The "Deep Brain")</h4>
+                                <ul class="text-sm text-indigo-900 space-y-2 list-disc pl-4 font-medium">
+                                    <li><strong>Purpose:</strong> Act as Tier-3 Senior Analysts evaluating high-fidelity "Alerts".</li>
+                                    <li><strong>Action:</strong> Correlates disparate events across time, analyzes malware logic, and formulates surgical mitigation strategies.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Arch & Eng Lens -->
+                    <section>
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 flex items-center gap-2 text-cyan-700"><i data-lucide="settings" class="w-5 h-5"></i> Engineering Lens</h3>
+                        <div class="space-y-4">
+                            <div class="bg-cyan-50 p-4 rounded-xl border border-cyan-200 shadow-sm">
+                                <h4 class="text-cyan-800 font-bold mb-2 text-sm flex items-center gap-2"><i data-lucide="gauge" class="w-4 h-4 text-cyan-600"></i> Observability & Resilience</h4>
+                                <p class="text-sm text-cyan-900 font-medium leading-relaxed">If Kafka queues fill up or vLLM GPUs max out, the SOC is blind. A dedicated Observability stack (Prometheus/Grafana) ensures internal health is monitored continuously.</p>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
+                                <h4 class="text-slate-800 font-bold mb-2 text-sm flex items-center gap-2"><i data-lucide="git-merge" class="w-4 h-4 text-slate-600"></i> GitOps & IaC</h4>
+                                <p class="text-sm text-slate-700 font-medium leading-relaxed">Changes to SOC logic are pushed deterministically via GitOps (ArgoCD) to prevent configuration drift and allow instant rollbacks of broken correlation rules.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- EA Lens -->
+                    <section>
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 flex items-center gap-2 text-purple-700"><i data-lucide="layout-template" class="w-5 h-5"></i> Enterprise Arch Lens</h3>
+                        <div class="space-y-4">
+                            <div class="bg-sky-50 p-4 rounded-xl border border-sky-200 shadow-sm">
+                                <h4 class="text-sky-800 font-bold mb-2 text-sm flex items-center gap-2"><i data-lucide="cloud-cog" class="w-4 h-4 text-sky-600"></i> Multi-Cloud CNAPP</h4>
+                                <p class="text-sm text-sky-900 font-medium leading-relaxed">The enterprise spans AWS, Azure, and GCP. A CNAPP platform provides deep context into cloud control planes, identities, and serverless architectures.</p>
+                            </div>
+                            <div class="bg-purple-50 p-4 rounded-xl border border-purple-200 shadow-sm">
+                                <h4 class="text-purple-800 font-bold mb-2 text-sm flex items-center gap-2"><i data-lucide="workflow" class="w-4 h-4 text-purple-600"></i> iPaaS Integration Bus</h4>
+                                <p class="text-sm text-purple-900 font-medium leading-relaxed">Point-to-point APIs are an anti-pattern. The AI uses an Enterprise Service Bus (MuleSoft/Boomi) to provide standardized connectors to corporate tools.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- GRC Lens -->
+                    <section>
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 flex items-center gap-2 text-pink-700"><i data-lucide="scale" class="w-5 h-5"></i> GRC & Compliance Lens</h3>
+                        <div class="space-y-4">
+                            <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-200 shadow-sm">
+                                <h4 class="text-indigo-800 font-bold mb-2 text-sm flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-indigo-600"></i> Data Sovereignty</h4>
+                                <p class="text-sm text-indigo-900 font-medium leading-relaxed">A Sovereignty Router explicitly evaluates data origin and routes EU logs to geo-fenced LLM enclaves to prevent massive GDPR fines.</p>
+                            </div>
+                            <div class="bg-pink-50 p-4 rounded-xl border border-pink-200 shadow-sm">
+                                <h4 class="text-pink-800 font-bold mb-2 text-sm flex items-center gap-2"><i data-lucide="scroll" class="w-4 h-4 text-pink-600"></i> Policy-as-Code (PaC)</h4>
+                                <p class="text-sm text-pink-900 font-medium leading-relaxed">PaC engines (OPA) evaluate every AI action against strict digital policies before execution, acting as a hard programmatic brake on unauthorized actions.</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Attack Simulator Modal -->
+    <div id="simulator-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white border border-slate-200 rounded-xl max-w-4xl w-full shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-xl shrink-0">
+                <h2 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center gap-2">
+                    ✨ AI Attack Simulator
+                </h2>
+                <button onclick="closeAttackSimulator()" class="text-slate-400 hover:text-slate-600 bg-white p-1 rounded-md border border-slate-200 shadow-sm transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-8 overflow-y-auto flex-1 custom-scrollbar bg-white">
+                <div class="mb-6">
+                    <label class="block text-base font-bold text-slate-800 mb-3">Describe an attack scenario to simulate against this architecture:</label>
+                    <textarea id="attack-input" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-4 text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all resize-none shadow-inner text-sm font-medium" rows="4" placeholder="e.g., An insider threat with valid credentials slowly downloading 50GB of customer data to an external drive..."></textarea>
+                </div>
+                <button onclick="runSimulation()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold transition-all shadow-md flex items-center justify-center gap-2 mb-8 text-lg">
+                    <i data-lucide="play" class="w-5 h-5"></i> Run AI Simulation
+                </button>
+
+                <div id="simulation-output" class="hidden">
+                    <h3 class="text-base font-black text-slate-800 uppercase tracking-widest mb-5 border-b border-slate-200 pb-3 flex items-center gap-2"><i data-lucide="terminal" class="text-indigo-600"></i> Simulation Results</h3>
+                    <div id="simulation-content" class="text-sm text-slate-700 space-y-5 leading-relaxed font-medium">
+                        <!-- AI content injected here -->
+                    </div>
+                </div>
+                
+                <div id="simulation-loading" class="hidden flex flex-col items-center justify-center py-12">
+                    <i data-lucide="loader-2" class="w-10 h-10 text-indigo-600 animate-spin mb-4"></i>
+                    <p class="text-base font-bold text-indigo-800 animate-pulse">Consulting the Agentic LLM Core...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Key Configuration Modal -->
+    <div id="api-key-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white border border-slate-200 rounded-xl max-w-md w-full shadow-2xl flex flex-col">
+            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-xl shrink-0">
+                <h2 class="text-xl font-bold text-teal-700 flex items-center gap-2">
+                    <i data-lucide="key" class="text-teal-600"></i> API Configuration
+                </h2>
+                <button onclick="closeApiKeyModal()" class="text-slate-400 hover:text-slate-600 bg-white p-1 rounded-md border border-slate-200 shadow-sm transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 bg-white rounded-b-xl">
+                <p class="text-sm text-slate-600 mb-5 leading-relaxed font-medium">
+                    To use the AI-powered features on your own hosted version, please provide your Gemini API key. This key is stored <strong>locally in your browser</strong> and is never sent to our servers.
+                </p>
+                <div class="mb-5">
+                    <label class="block text-sm font-bold text-slate-800 mb-2">Gemini API Key</label>
+                    <input type="password" id="api-key-input" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all shadow-inner font-mono text-sm" placeholder="AIzaSy...">
+                </div>
+                <div class="bg-teal-50 rounded-lg p-4 mb-6 border border-teal-200 shadow-sm">
+                    <h4 class="text-xs font-bold text-teal-900 mb-1 flex items-center gap-1.5"><i data-lucide="help-circle" class="w-4 h-4 text-teal-600"></i> Where do I find this?</h4>
+                    <p class="text-xs text-teal-800 font-medium">Get a free API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-teal-600 font-bold hover:underline">Google AI Studio</a>. Click "Create API key", copy it, and paste it here.</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="saveApiKey()" class="flex-1 py-2.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold transition-all shadow-sm flex items-center justify-center gap-2">
+                        <i data-lucide="save" class="w-4 h-4"></i> Save Key
+                    </button>
+                    <button onclick="clearApiKey()" class="py-2.5 px-4 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 transition-all border border-rose-200 shadow-sm flex items-center justify-center gap-2" title="Clear Key">
+                        <i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Gemini API Configuration
+        const apiKey = ""; 
+        
+        // Custom BYOK Logic (Bring Your Own Key)
+        function openApiKeyModal() {
+            document.getElementById('api-key-input').value = localStorage.getItem('soc_gemini_api_key') || "";
+            document.getElementById('api-key-modal').classList.remove('hidden');
+        }
+        function closeApiKeyModal() { document.getElementById('api-key-modal').classList.add('hidden'); }
+        function saveApiKey() {
+            const val = document.getElementById('api-key-input').value.trim();
+            if(val) localStorage.setItem('soc_gemini_api_key', val);
+            else localStorage.removeItem('soc_gemini_api_key');
+            closeApiKeyModal();
+        }
+        function clearApiKey() {
+            document.getElementById('api-key-input').value = "";
+            localStorage.removeItem('soc_gemini_api_key');
+        }
+        
+        async function fetchWithRetry(url, options, retries = 5) {
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(`HTTP error ${response.status}: ${JSON.stringify(errorData)}`);
+                    }
+                    return await response.json();
+                } catch (e) {
+                    if (i === retries - 1) throw e;
+                    console.warn(`Attempt ${i + 1} failed, retrying in ${delays[i]}ms...`);
+                    await new Promise(r => setTimeout(r, delays[i]));
+                }
+            }
+        }
+
+        async function callGeminiAPI(prompt, systemInstruction) {
+            let activeKey = apiKey || localStorage.getItem('soc_gemini_api_key');
+            
+            if (!activeKey) {
+                openApiKeyModal();
+                throw new Error("API Key is missing. Please configure your Gemini API Key in the settings to run this feature.");
+            }
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${activeKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+            };
+
+            const data = await fetchWithRetry(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+        }
+
+        // Modals Logic
+        function openConceptsModal() { document.getElementById('concepts-modal').classList.remove('hidden'); }
+        function closeConceptsModal() { document.getElementById('concepts-modal').classList.add('hidden'); }
+        function openAttackSimulator() { document.getElementById('simulator-modal').classList.remove('hidden'); }
+        function closeAttackSimulator() { document.getElementById('simulator-modal').classList.add('hidden'); }
+
+        async function runSimulation() {
+            const input = document.getElementById('attack-input').value;
+            if (!input.trim()) return;
+
+            document.getElementById('simulation-output').classList.add('hidden');
+            document.getElementById('simulation-loading').classList.remove('hidden');
+            document.getElementById('simulation-loading').classList.add('flex');
+
+            const systemPrompt = "You are an expert Enterprise Cybersecurity Architect analyzing an attack against your custom AI-driven SOC architecture. Respond using clean HTML formatting suitable to be placed directly into a div (use <ul>, <li>, <p>, <strong>, and styling classes like 'text-emerald-700' for defense actions and 'text-rose-700' for attack steps if appropriate). Do not include markdown block wrappers (like ```html). Make the tone highly professional.";
+            const userPrompt = `Simulate how this specific architecture (Telemetry/CNAPP/NDR/Deception -> Edge Sovereignty/SLMs -> Correlation/UEBA/Hot Storage -> Router/Agentic LLM + RAG/Provenance + Guardrails -> MCP/Vault/APIGW/iPaaS/PaC/Ledger/Copilot) would detect, analyze, mitigate, and document the following attack: "${input}". Break it down phase by phase matching the architecture. Highlight any areas where Enterprise Architecture components (like CNAPP context, Semantic Routing for cost, or iPaaS for integration) actively play a role.`;
+
+            try {
+                let responseText = await callGeminiAPI(userPrompt, systemPrompt);
+                responseText = responseText.replace(/```html/g, '').replace(/```/g, '');
+                
+                document.getElementById('simulation-content').innerHTML = responseText;
+                document.getElementById('simulation-loading').classList.add('hidden');
+                document.getElementById('simulation-loading').classList.remove('flex');
+                document.getElementById('simulation-output').classList.remove('hidden');
+            } catch (error) {
+                document.getElementById('simulation-content').innerHTML = `<p class="text-rose-600 font-bold">Simulation failed: ${error.message}</p>`;
+                document.getElementById('simulation-loading').classList.add('hidden');
+                document.getElementById('simulation-loading').classList.remove('flex');
+                document.getElementById('simulation-output').classList.remove('hidden');
+            }
+        }
+
+        // AI Explainer Logic
+        async function explainComponent(style) {
+            if (!currentNode) return;
+            const data = nodeData[currentNode];
+            const detailPanel = document.getElementById('detail-content');
+            
+            detailPanel.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full py-12 text-center gap-4">
+                    <i data-lucide="loader-2" class="w-10 h-10 text-indigo-600 animate-spin"></i>
+                    <p class="text-base font-bold text-indigo-800 animate-pulse">✨ Generating ${style} explanation for ${data.title}...</p>
+                </div>
+            `;
+            lucide.createIcons();
+
+            const systemPrompt = "You are a versatile cybersecurity educator and Enterprise Architect. Provide responses in clean HTML format (using <p>, <ul>, <strong>). No markdown blocks. Ensure the text is styled for a light theme (use standard text colors, no white text).";
+            let userPrompt = style === 'ELI5' 
+                ? `Explain this SOC architecture component to a non-technical 5-year-old using fun analogies (like guards, castles, librarians, or trains). Component: ${data.title}. Role: ${data.concept}. Mitigation/Engineering Value: ${data.mitigation}. Keep it to 2-3 short paragraphs.`
+                : `Provide a deep-dive, highly technical explanation of this SOC architecture component for a Principal Enterprise Systems Engineer. Component: ${data.title}. Role: ${data.concept}. Specs: ${data.techSpecs}. Expand on how this technology works under the hood (e.g., protocols, algorithms, enterprise integration patterns, FinOps). Keep it strictly to 3 paragraphs.`;
+
+            try {
+                let responseText = await callGeminiAPI(userPrompt, systemPrompt);
+                responseText = responseText.replace(/```html/g, '').replace(/```/g, '');
+                
+                detailPanel.innerHTML = `
+                    <div class="mb-5 flex items-center justify-between border-b border-slate-200 pb-3">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="sparkles" class="w-5 h-5 text-indigo-600"></i>
+                            <h3 class="text-sm font-black text-indigo-900 uppercase tracking-widest">${style} AI View: ${data.title}</h3>
+                        </div>
+                        <button onclick="selectNode('${currentNode}')" class="text-xs font-bold text-slate-500 hover:text-slate-800 underline transition-colors">Revert to Standard</button>
+                    </div>
+                    <div class="text-sm text-slate-700 space-y-5 leading-relaxed font-medium">
+                        ${responseText}
+                    </div>
+                `;
+                lucide.createIcons();
+            } catch (error) {
+                detailPanel.innerHTML = `<p class="text-rose-600 font-bold">Generation failed. <button onclick="selectNode('${currentNode}')" class="underline">Go back</button></p>`;
+            }
+        }
+
+        // View Switching
+        function switchView(view) {
+            const logicalBtn = document.getElementById('btn-logical');
+            const technicalBtn = document.getElementById('btn-technical');
+            const logicalView = document.getElementById('view-logical');
+            const technicalView = document.getElementById('view-technical');
+
+            if (view === 'logical') {
+                logicalBtn.className = "px-4 py-2 text-sm rounded-md bg-sky-100 text-sky-700 font-bold border border-sky-200 transition-all shadow-sm";
+                technicalBtn.className = "px-4 py-2 text-sm rounded-md text-slate-600 hover:text-slate-900 hover:bg-white font-medium transition-all";
+                logicalView.classList.remove('view-hidden');
+                technicalView.classList.add('view-hidden');
+            } else {
+                technicalBtn.className = "px-4 py-2 text-sm rounded-md bg-sky-100 text-sky-700 font-bold border border-sky-200 transition-all shadow-sm";
+                logicalBtn.className = "px-4 py-2 text-sm rounded-md text-slate-600 hover:text-slate-900 hover:bg-white font-medium transition-all";
+                technicalView.classList.remove('view-hidden');
+                logicalView.classList.add('view-hidden');
+            }
+            
+            if (currentNode) {
+                document.getElementById(currentNode)?.classList.remove('node-selected');
+                currentNode = null;
+                document.getElementById('ai-actions').classList.add('hidden');
+                document.getElementById('detail-content').innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-slate-400 text-center gap-4">
+                        <i data-lucide="mouse-pointer-click" class="w-16 h-16 opacity-30 text-slate-400"></i>
+                        <p class="text-sm font-medium text-slate-500 max-w-[250px]">Select a component to view details.</p>
+                    </div>`;
+                lucide.createIcons();
+            }
+        }
+
+        // Node Data Dictionary (Light Theme Colors Applied)
+        const nodeData = {
+            // --- LOGICAL NODES ---
+            'telemetry': {
+                title: 'Log Telemetry', icon: 'cloud', color: 'text-slate-600',
+                concept: 'The foundational layer generating diverse enterprise signals from endpoints, servers, and networks.',
+                techSpecs: 'Pushes JSON/CEF logs to Ingress APIs over TLS 1.3.',
+                detection: 'Passive generation. Provides the raw material for detection.',
+                mitigation: 'Endpoints rely on local AV blocks for immediate commodity drops.'
+            },
+            'cnapp': {
+                title: 'Cloud Native Application Protection', icon: 'cloud-cog', color: 'text-sky-600',
+                concept: 'Deep multi-cloud context (AWS, Azure, GCP). Merges CSPM, CWPP, and CIEM.',
+                techSpecs: 'API-driven integrations pulling cloud control plane logs, identity entitlements, and serverless executions.',
+                detection: 'Identifies toxic combinations in the cloud (e.g., an S3 bucket made public + an over-privileged IAM role attached to it).',
+                mitigation: '<strong>Enterprise Arch Value:</strong> Prevents cloud-native breaches that traditional endpoint-focused EDRs are entirely blind to.'
+            },
+            'ndr': {
+                title: 'Network Detection (NDR/PCAP)', icon: 'network', color: 'text-teal-600',
+                concept: 'Deep Packet Inspection on the wire. "Logs Lie. Packets Don\'t."',
+                techSpecs: 'Zeek or Suricata sensors tapping Core/Edge switches via SPAN/TAP ports.',
+                detection: 'Catches the attackers hiding from the EDR. Detects DNS Tunneling, SMB beaconing, and encrypted C2 channels.',
+                mitigation: 'Feeds raw, un-tamperable truth directly into the Kafka stream.'
+            },
+            'cti': {
+                title: 'Global CTI Feeds', icon: 'globe-2', color: 'text-purple-600',
+                concept: 'Continuous ingestion of external Threat Intel to inform systems of global campaigns.',
+                techSpecs: 'Ingests STIX/TAXII protocols from CISA, ISACs, and commercial feeds.',
+                detection: 'Provides Correlation Engine with static IoCs and RAG DB with TTP context.',
+                mitigation: 'Proactively seeds firewall blocklists before attacks hit the perimeter.'
+            },
+            'asm': {
+                title: 'Attack Surface Management (ASM)', icon: 'scan', color: 'text-pink-600',
+                concept: 'Real-time context of internal asset vulnerabilities and misconfigurations.',
+                techSpecs: 'Ingests CVE scan data from tools like Tenable/Qualys via APIs.',
+                detection: 'Crucial context for the LLM to understand if a detected exploit attempt can actually succeed against the targeted server.',
+                mitigation: 'Prioritizes patching queues; informs the LLM to trigger immediate isolation if a critical vulnerability is under active exploit.'
+            },
+            'deception': {
+                title: 'Deception Network (Honeypots)', icon: 'ghost', color: 'text-yellow-600',
+                concept: 'Decoy assets (fake servers, fake AWS keys, honeytokens) scattered throughout the environment.',
+                techSpecs: 'Deployed seamlessly within VPCs and endpoints. Completely silent until interacted with.',
+                detection: '<strong>The Ultimate High-Fidelity Signal:</strong> Zero false positives. If a decoy is touched, the Correlation Engine is bypassed, and an emergency Alert is sent straight to the Agentic LLM.',
+                mitigation: 'Allows the SOC to instantly lock down an attacker during the early reconnaissance phase before real assets are breached.'
+            },
+            'bas': {
+                title: 'Red AI & Attack Simulation', icon: 'swords', color: 'text-red-600',
+                concept: 'Fighting AI with AI. An offensive model continuously trying to bypass the defensive SOC.',
+                techSpecs: 'Autonomous agents deploying dynamically mutated, safe payloads against the network edge.',
+                detection: 'Acts as the ultimate tester. Mutates code structure to ensure the SLM doesn\'t just memorize patterns, but understands malicious intent.',
+                mitigation: 'Identifies blind spots in the Correlation rules and trains the Edge SLMs to catch zero-day obfuscation techniques.'
+            },
+            'sovereignty': {
+                title: 'Data Sovereignty Router', icon: 'map-pin', color: 'text-indigo-600',
+                concept: 'Ensures compliance with global data localization laws (e.g., GDPR, CCPA).',
+                techSpecs: 'Edge proxies evaluating payload origin and routing traffic to geo-fenced clusters.',
+                detection: 'Identifies cross-border data transfer violations before they occur.',
+                mitigation: '<strong>GRC Compliance:</strong> Prevents massive regulatory fines by dynamically routing EU user telemetry to EU-based SLM/LLM enclaves, never touching US infrastructure.'
+            },
+            'slm': {
+                title: 'Edge Small Language Models', icon: 'cpu', color: 'text-emerald-600',
+                concept: 'Specialized, low-parameter models processing data streams instantly at the edge.',
+                techSpecs: '1B-8B parameter models (e.g., Llama-3-8B) deployed on edge compute nodes.',
+                detection: '<strong>Current Threats:</strong> Detects LotL techniques by parsing obfuscated scripts instantly. Inspects packet headers from the NDR.',
+                mitigation: '<strong>Data Privacy:</strong> Dynamically masks PII/PHI before SIEM ingestion.'
+            },
+            'correlation': {
+                title: 'Correlation Engine', icon: 'activity', color: 'text-orange-600',
+                concept: 'High-speed deterministic engine evaluating rules against normalized data streams.',
+                techSpecs: 'Stream processing architectures (Flink) matching against Sigma rules.',
+                detection: '<strong>Past Threats:</strong> Excellent at catching known bads—malicious IPs, brute-force patterns.',
+                mitigation: 'Triggers predefined SOAR playbooks for high-confidence, low-complexity alerts.'
+            },
+            'ueba': {
+                title: 'UEBA Engine (Insider Threat)', icon: 'user-cog', color: 'text-indigo-600',
+                concept: 'Unsupervised Machine Learning establishing a behavioral baseline for every identity and asset.',
+                techSpecs: 'Analyzes volume, frequency, and peer-group deviations (e.g., "User X has never accessed this DB before, and their peers don\'t either").',
+                detection: '<strong>Blue Team Core:</strong> Detects Insider Threats and compromised valid credentials (e.g., impossible travel, massive data hoarding) that evade static Correlation rules.',
+                mitigation: 'Fires high-priority behavioral anomaly alerts to the Agentic LLM to investigate the user\'s full context.'
+            },
+            'hot-storage': {
+                title: 'Hot Data Index', icon: 'database-zap', color: 'text-blue-600',
+                concept: 'Ultra-fast, searchable index of the most recent ~30 days of normalized telemetry.',
+                techSpecs: 'Elasticsearch, OpenSearch, or Splunk clustered indexers optimized for read speed.',
+                detection: 'Provides sub-second querying for human analysts hunting for historical IoCs over the past month.',
+                mitigation: 'Crucial for the Agentic LLM: the LLM dynamically queries this Hot Index via MCP to find related events.'
+            },
+            'rag': {
+                title: 'RAG Context DB', icon: 'database', color: 'text-fuchsia-600',
+                concept: 'Provides the LLM with long-term memory and organizational awareness.',
+                techSpecs: 'Vector database storing text embeddings of corporate policies, past incidents, and topology.',
+                detection: 'Aids the LLM by confirming if an anomaly is a known authorized IT activity.',
+                mitigation: 'Provides the LLM with tested, organization-approved remediation runbooks.'
+            },
+            'provenance': {
+                title: 'Data Provenance Engine', icon: 'file-badge-2', color: 'text-emerald-600',
+                concept: 'Defense against RAG Poisoning. Verifies the integrity of the data fed to the LLM.',
+                techSpecs: 'Cryptographic signing (e.g., Sigstore) for all documents ingested into the Milvus Vector DB.',
+                detection: 'Detects if an attacker has modified an internal wiki page to include hidden instructions like "Ignore alerts from this IP".',
+                mitigation: 'Blocks unsigned or tampered context from reaching the Agentic LLM, preventing adversarial manipulation of the AI\'s memory.'
+            },
+            'guardrail': {
+                title: 'AI Guardrails & SecOps', icon: 'shield-ban', color: 'text-rose-600',
+                concept: 'A mandatory security filter protecting the LLM from adversarial manipulation.',
+                techSpecs: 'Semantic filtering models (NeMo Guardrails) intercepting prompts before core inference.',
+                detection: 'Identifies Prompt Injection attacks hidden inside seemingly benign logs.',
+                mitigation: 'Sanitizes inputs and completely drops maliciously crafted payloads intended to jailbreak the Agentic Core.'
+            },
+            'router': {
+                title: 'Semantic Model Router', icon: 'split', color: 'text-amber-600',
+                concept: 'AI FinOps and Cost Optimization layer.',
+                techSpecs: 'A routing layer (e.g., LiteLLM, Semantic Router) that evaluates the complexity of the inbound prompt.',
+                detection: 'N/A',
+                mitigation: '<strong>Enterprise Arch Value:</strong> Saves millions in compute. Routes simple translation/summarization tasks to cheap, fast 8B models, reserving the expensive 70B Agentic Core strictly for deep malware analysis and complex correlation.'
+            },
+            'llm': {
+                title: 'Agentic LLM Host', icon: 'brain-circuit', color: 'text-indigo-700',
+                concept: 'The cognitive core capable of advanced reasoning, hypothesis generation, and intent deduction.',
+                techSpecs: 'Deep reasoning models operating asynchronously on filtered alerts.',
+                detection: '<strong>Future/Complex Threats:</strong> Detects novel attacks by correlating disparate events. Identifies AI-generated polymorphic malware logic.',
+                mitigation: 'Acts as an autonomous Tier-3 analyst. Formulates dynamic response plans, orchestrates isolation via MCP.'
+            },
+            'vault': {
+                title: 'Secrets Vault (IAM)', icon: 'key-round', color: 'text-teal-600',
+                concept: 'Identity & Access Management for the AI. Ensures the AI operates on a Zero Trust / Least Privilege model.',
+                techSpecs: 'A Privileged Access Management (PAM) system generating ephemeral tokens.',
+                detection: 'N/A',
+                mitigation: 'Prevents "God Mode". The AI cannot hold static keys. It must request a Just-In-Time (JIT) token to execute an MCP command, ensuring a compromised AI cannot destroy the network.'
+            },
+            'api-gw': {
+                title: 'API Gateway', icon: 'route', color: 'text-teal-600',
+                concept: 'The traffic cop between the AI network and the Enterprise network.',
+                techSpecs: 'A high-performance reverse proxy (Kong/Istio) handling L7 routing, mTLS, and rate limiting.',
+                detection: 'Detects anomalous API usage spikes originating from the MCP middleware.',
+                mitigation: '<strong>System Resilience:</strong> Protects enterprise APIs (like ServiceNow or Okta) from being inadvertently DDoS\'d by a misconfigured or runaway Agentic AI loop.'
+            },
+            'ipaas': {
+                title: 'iPaaS Integration Bus', icon: 'workflow', color: 'text-purple-600',
+                concept: 'The standardized Enterprise Service Bus eliminating point-to-point spaghetti code.',
+                techSpecs: 'Integration Platform as a Service (MuleSoft, Boomi, Workato).',
+                detection: 'N/A',
+                mitigation: '<strong>Enterprise Arch Value:</strong> Decouples the AI from underlying vendor APIs. If the enterprise switches from CrowdStrike to SentinelOne, the AI doesn\'t break; only the iPaaS connector is updated.'
+            },
+            'pac': {
+                title: 'Policy-as-Code (PaC)', icon: 'scroll', color: 'text-pink-600',
+                concept: 'Translates corporate governance and regulatory requirements into executable code.',
+                techSpecs: 'Open Policy Agent (OPA) utilizing Rego policies evaluated against every MCP request.',
+                detection: 'Detects policy violations initiated by the AI or analysts (e.g., trying to reboot a Tier-1 server during business hours).',
+                mitigation: '<strong>GRC Enforcement:</strong> Acts as a hard programmatic brake. It will deny AI mitigation commands if they violate compliance rules, ensuring the AI never breaks corporate policy.'
+            },
+            'ledger': {
+                title: 'Immutable Ledger (Compliance)', icon: 'scroll-text', color: 'text-slate-600',
+                concept: 'A cryptographically secure system of record ensuring Non-Repudiation for all AI decisions.',
+                techSpecs: 'WORM (Write-Once-Read-Many) storage, such as AWS S3 Object Lock.',
+                detection: 'N/A',
+                mitigation: 'Critical for Legal/Compliance. If the SOC is audited or goes to court, this ledger proves exactly what the AI saw and why it made a containment decision, with a verifiable Chain of Custody.'
+            },
+            'hitl': {
+                title: 'Analyst Copilot & Threat Hunting', icon: 'crosshairs', color: 'text-amber-600',
+                concept: 'The Blue Team workbench for governance, collaboration, and proactive defense.',
+                techSpecs: 'React-based dashboard integrating ChatOps for interactive webhook approvals and NLP-to-SPL query generation.',
+                detection: '<strong>Proactive Hunting:</strong> Allows analysts to use natural language to actively sweep the Data Lake for hidden adversaries before alerts even trigger.',
+                mitigation: 'Provides the final "Approve" or "Rollback" command to the MCP.'
+            },
+            'exec-dash': {
+                title: 'CISO Executive Dashboard', icon: 'pie-chart', color: 'text-indigo-600',
+                concept: 'The Board-level translation layer that converts microsecond AI actions into business metrics.',
+                techSpecs: 'BI Platforms (Tableau, PowerBI) ingesting metrics from the ITSM and MCP ledgers.',
+                detection: 'Visualizes the overall risk posture, active threat campaigns mapped to MITRE, and defense readiness scores from the BAS validation loop.',
+                mitigation: 'Calculates the ROI of the AI SOC. Demonstrates improvements in MTTD (Mean Time to Detect) and MTTR (Mean Time to Respond) to the Board of Directors.'
+            },
+            'mcp': {
+                title: 'MCP Interface', icon: 'plug', color: 'text-cyan-600',
+                concept: 'The "hands and feet" of the AI. Translates LLM intent into actual API calls.',
+                techSpecs: 'Middleware implementing the open-source Model Context Protocol.',
+                detection: 'Allows the LLM to query EDR for live memory dumps or the Hot Index for historical logs.',
+                mitigation: 'Generates standardized JSON payloads for mitigation actions, routed through the iPaaS Bus.'
+            },
+            'mlops': {
+                title: 'MLOps & Continuous Learning', icon: 'refresh-cw', color: 'text-emerald-600',
+                concept: 'The feedback mechanism ensuring the SOC learns from human corrections.',
+                techSpecs: 'Pipelines utilizing RLHF and Parameter-Efficient Fine-Tuning (PEFT/LoRA).',
+                detection: 'Deploys new Sigma rules to the Correlation engine based on novel attacks.',
+                mitigation: 'Fine-tunes Edge SLMs to better recognize obfuscation techniques that initially bypassed them.'
+            },
+            'gitops': {
+                title: 'GitOps (IaC Configuration)', icon: 'git-merge', color: 'text-slate-600',
+                concept: 'Deterministic deployment pipeline for SOC infrastructure and rules.',
+                techSpecs: 'Continuous deployment (ArgoCD) synced to a Git repository storing Terraform and Kubernetes manifests.',
+                detection: 'Detects configuration drift between the declared desired state and the running production cluster.',
+                mitigation: '<strong>System Resilience:</strong> Ensures that if a new Sigma rule breaks the Flink cluster, it can be rolled back instantly via a Git revert.'
+            },
+            'observability': {
+                title: 'SOC Observability Stack', icon: 'gauge', color: 'text-cyan-600',
+                concept: 'The system that monitors the health of the security architecture itself.',
+                techSpecs: 'Prometheus metrics, Grafana dashboards, and OpenTelemetry (OTel) distributed tracing.',
+                detection: '<strong>Platform Health:</strong> Detects if Kafka queues are filling up, if the vLLM nodes are OOM crashing, or if the API Gateway latency spikes.',
+                mitigation: '<strong>System Resilience:</strong> Triggers auto-scaling of K8s pods before the SOC drops raw logs due to backpressure, preventing silent security failures.'
+            }
+        };
+
+        // --- TECHNICAL NODES ---
+        Object.assign(nodeData, {
+            'tech-kafka': { title: 'Apache Kafka Fabric', icon: 'layers', color: 'text-slate-600', concept: 'Distributed event streaming platform.', techSpecs: 'K8s StatefulSets handling 100k+ EPS.', detection: 'N/A', mitigation: 'N/A' },
+            'tech-cnapp': { ...nodeData['cnapp'], title: 'Wiz / Prisma Cloud', icon: 'cloud-cog' },
+            'tech-cti': { ...nodeData['cti'], title: 'MISP (CTI Servers)', icon: 'globe' },
+            'tech-asm': { ...nodeData['asm'], title: 'Qualys/Tenable APIs', icon: 'scan' },
+            'tech-deception': { ...nodeData['deception'], title: 'Thinkst Canaries', icon: 'ghost' },
+            'tech-bas': { ...nodeData['bas'], title: 'Red AI / AttackIQ', icon: 'swords' },
+            'tech-sovereignty': { ...nodeData['sovereignty'], title: 'Envoy / Geo-Router', icon: 'map-pin' },
+            'tech-ndr': { ...nodeData['ndr'], title: 'Zeek / Corelight (NDR)', icon: 'network' },
+            'tech-slm': { ...nodeData['slm'], title: 'Triton Inference (SLM)', icon: 'cpu' },
+            'tech-flink': { ...nodeData['correlation'], title: 'Apache Flink Cluster', icon: 'activity' },
+            'tech-ueba': { ...nodeData['ueba'], title: 'Spark MLlib / UEBA', icon: 'user-cog' },
+            'tech-hot-storage': { ...nodeData['hot-storage'], title: 'OpenSearch / Elastic Cluster', icon: 'database-zap' },
+            'tech-siem': { title: 'Iceberg Data Lake', icon: 'archive', color: 'text-slate-600', concept: 'Massive scale cold storage.', techSpecs: 'Apache Iceberg on S3.', detection: 'Slow-burn LotL attacks via batch queries.', mitigation: 'Forensic evidence retention.' },
+            'tech-milvus': { ...nodeData['rag'], title: 'Milvus Vector DB', icon: 'database' },
+            'tech-provenance': { ...nodeData['provenance'], title: 'Sigstore Signatures', icon: 'file-badge-2' },
+            'tech-guardrail': { ...nodeData['guardrail'], title: 'NeMo Guardrails', icon: 'shield-ban' },
+            'tech-router': { ...nodeData['router'], title: 'LiteLLM / Semantic Router', icon: 'split' },
+            'tech-llm': { ...nodeData['llm'], title: 'vLLM Inference Node', icon: 'server-cog' },
+            'tech-hitl': { ...nodeData['hitl'], title: 'Analyst Workbench / Jupyter', icon: 'crosshairs' },
+            'tech-pac': { ...nodeData['pac'], title: 'Open Policy Agent (OPA)', icon: 'scroll' },
+            'tech-chatops': { ...nodeData['hitl'], title: 'Slack/Teams Integrations', icon: 'message-square' },
+            'tech-exec-dash': { ...nodeData['exec-dash'], title: 'Tableau / PowerBI Dashboards', icon: 'pie-chart' },
+            'tech-vault': { ...nodeData['vault'], title: 'HashiCorp Vault / CyberArk', icon: 'key-round' },
+            'tech-ledger': { ...nodeData['ledger'], title: 'AWS S3 Object Lock (WORM)', icon: 'scroll-text' },
+            'tech-mcp': { ...nodeData['mcp'], title: 'MCP Microservices', icon: 'network' },
+            'tech-ipaas': { ...nodeData['ipaas'], title: 'MuleSoft / Boomi', icon: 'workflow' },
+            'tech-mlops': { ...nodeData['mlops'], title: 'Kubeflow / MLflow', icon: 'box' },
+            'tech-gitops': { ...nodeData['gitops'], title: 'ArgoCD / Terraform', icon: 'git-merge' },
+            'tech-observability': { ...nodeData['observability'], title: 'Prometheus / Grafana', icon: 'gauge' },
+            'tech-api-gw': { ...nodeData['api-gw'], title: 'Istio / Kong API Gateway', icon: 'route' }
+        });
+
+        // Shared handlers for physical action nodes (logical view)
+        nodeData['mcp-edr'] = { title: 'EDR API', icon: 'laptop', color: 'text-sky-600', concept: 'Endpoint API connection.', techSpecs: 'CrowdStrike or SentinelOne API.', detection: 'N/A', mitigation: 'Host isolation.' };
+        nodeData['mcp-idp'] = { title: 'Identity API', icon: 'users', color: 'text-sky-600', concept: 'Identity API connection.', techSpecs: 'Okta or Azure AD API.', detection: 'N/A', mitigation: 'Token revocation.' };
+        nodeData['mcp-fw'] = { title: 'Firewall API', icon: 'shield-alert', color: 'text-sky-600', concept: 'Perimeter API connection.', techSpecs: 'Palo Alto or Fortinet API.', detection: 'N/A', mitigation: 'IP blocklisting.' };
+        nodeData['mcp-itsm'] = { 
+            title: 'ITSM API', icon: 'ticket', color: 'text-sky-600', 
+            concept: 'The System of Record for the Security Operations Center.', 
+            techSpecs: 'ServiceNow, Jira Service Management, or TheHive.', 
+            detection: 'N/A', 
+            mitigation: '<strong>Crucial Final Step:</strong> The AI uses this connection to automatically draft the post-mortem, attach forensic queries, assign it to a queue, and formally document the containment actions taken.' 
+        };
+
+        let currentNode = null;
+
+        function selectNode(nodeId) {
+            if (currentNode && document.getElementById(currentNode)) {
+                const prevEls = document.querySelectorAll(`[onclick="selectNode('${currentNode}')"]`);
+                prevEls.forEach(el => el.classList.remove('node-selected'));
+            }
+            
+            const els = document.querySelectorAll(`[onclick="selectNode('${nodeId}')"]`);
+            els.forEach(el => el.classList.add('node-selected'));
+            currentNode = nodeId;
+            
+            document.getElementById('ai-actions').classList.remove('hidden');
+
+            const data = nodeData[nodeId];
+            if(!data) return;
+
+            const detailPanel = document.getElementById('detail-content');
+            detailPanel.style.opacity = '0';
+            
+            setTimeout(() => {
+                detailPanel.innerHTML = `
+                    <div class="mb-6">
+                        <div class="flex items-center gap-3 mb-5 pb-4 border-b border-slate-200">
+                            <div class="p-3 bg-white rounded-lg border border-slate-200 shadow-sm">
+                                <i data-lucide="${data.icon}" class="w-6 h-6 ${data.color}"></i>
+                            </div>
+                            <h3 class="text-xl font-black text-slate-800 leading-tight">${data.title}</h3>
+                        </div>
+                        
+                        <div class="space-y-5">
+                            <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                                <h4 class="text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 flex items-center gap-1.5"><i data-lucide="info" class="w-4 h-4"></i> Concept & Role</h4>
+                                <p class="text-sm text-slate-700 leading-relaxed font-medium">${data.concept}</p>
+                            </div>
+                            
+                            <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                                <h4 class="text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-2 flex items-center gap-1.5"><i data-lucide="server" class="w-4 h-4"></i> Technical Specs</h4>
+                                <p class="text-sm text-slate-700 leading-relaxed font-medium">${data.techSpecs}</p>
+                            </div>
+                            
+                            <div class="bg-rose-50 rounded-xl p-4 border border-rose-200 border-l-4 border-l-rose-500 shadow-sm">
+                                <h4 class="text-[11px] uppercase tracking-widest text-rose-700 font-bold mb-2 flex items-center gap-1.5"><i data-lucide="target" class="w-4 h-4"></i> Threat Detection Profile</h4>
+                                <div class="text-sm text-rose-900 leading-relaxed font-medium">${data.detection}</div>
+                            </div>
+
+                            <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-200 border-l-4 border-l-emerald-500 shadow-sm">
+                                <h4 class="text-[11px] uppercase tracking-widest text-emerald-700 font-bold mb-2 flex items-center gap-1.5"><i data-lucide="shield-check" class="w-4 h-4"></i> Mitigation / Eng. Value</h4>
+                                <div class="text-sm text-emerald-900 leading-relaxed font-medium">${data.mitigation}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons();
+                detailPanel.style.opacity = '1';
+                detailPanel.style.transition = 'opacity 0.2s ease-in-out';
+            }, 100);
+        }
+    </script>
+</body>
+</html>
